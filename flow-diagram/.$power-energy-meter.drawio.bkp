@@ -1,0 +1,75 @@
+<mxfile host="Electron" modified="2023-07-21T11:46:51.845Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.5.1 Chrome/112.0.5615.204 Electron/24.6.0 Safari/537.36" etag="IW8DEyf1jCwsLePqBTEu" version="21.5.1" type="device">
+  <diagram name="Page-1" id="AaUq_ZtWOVlTvAVf8FJu">
+    <mxGraphModel dx="1541" dy="1098" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-13" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="3SbGRUDJCTW1QEdlGTZe-1" target="3SbGRUDJCTW1QEdlGTZe-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-1" value="Micro-controller" style="whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="-27" y="93" width="210" height="233" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-11" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="3SbGRUDJCTW1QEdlGTZe-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-29" y="128" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-3" value="Voltage Sensor" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="-281" y="98" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-12" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.007;entryY=0.798;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="3SbGRUDJCTW1QEdlGTZe-5" target="3SbGRUDJCTW1QEdlGTZe-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-5" value="Current sensor" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="-286" y="249" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-6" value="Power supply" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="-278" y="-172" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-14" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.132;entryY=0.533;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="3SbGRUDJCTW1QEdlGTZe-7" target="3SbGRUDJCTW1QEdlGTZe-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-7" value="GSM Module" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="18" y="-76" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-15" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.005;entryY=0.373;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;exitX=0.875;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="3SbGRUDJCTW1QEdlGTZe-8" target="3SbGRUDJCTW1QEdlGTZe-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-8" value="3G network" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="249" y="-106" width="131" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-9" value="Application" style="whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="491" y="-73" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-10" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="536" y="38" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-18" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-158" y="-141" as="sourcePoint" />
+            <mxPoint x="646" y="-141" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-19" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-316" y="-146" as="sourcePoint" />
+            <mxPoint x="-316" y="339" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-20" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="3SbGRUDJCTW1QEdlGTZe-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-310" y="128" as="sourcePoint" />
+            <mxPoint x="-260" y="78" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3SbGRUDJCTW1QEdlGTZe-21" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-312" y="276" as="sourcePoint" />
+            <mxPoint x="-283" y="276" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
