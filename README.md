@@ -42,7 +42,7 @@ Burden resistance = 2.5V / Secondary P2P current = 2.5V / 70.7mA x 1000 = 35.4 ð
 33 â„¦ is the closest standard resistor size below, giving a margin of safety for the ADC and is sufficiently low to prevent the CT from saturating.
 
 ## Conversion algorithm
-1. First we measure the voltage across the burder resistor by rapidlya sampling the ADC to digitize the AC signal by filtering out the DC ofset and calculating RMS current in the primary coil.
+1. First we measure the voltage across the burder resistor by rapidly sampling the ADC to digitize the AC signal by filtering out the DC offset and calculating RMS current in the primary coil.
 
 2. A FIXED value is used for the primary RMS voltage so the real power can be calculated along with the cost per KWh.
 
@@ -54,8 +54,12 @@ Burden resistance = 2.5V / Secondary P2P current = 2.5V / 70.7mA x 1000 = 35.4 ð
 
 6. Square each value from the filtered output to remove any negative values
 
-7. Take the square root of the average reading and scale it by the Arduino supply voltage. this will give us the RMS voltage across the burden resistor. This is proportional to the primary current.
+7. Take the square root of the average reading and scale it by the Arduino supply voltage. This will give us the RMS voltage across the burden resistor. This is proportional to the primary current.
 
-8. Multiply the PRIMARY RMS current by the PRIMARY RMS voltage to get the POWER in WATTS
+8. Multiply the RMS Voltage across the burder resitor by the current ratio to get the Primary RMS current
 
-9. From this, the cost per KWh can be calculated.
+9. Multiply the PRIMARY RMS current by the PRIMARY RMS voltage to get the POWER in WATTS
+
+10. From this, the cost per KWh can be calculated.
+
+![Conversion algorithm](./resources/conversion-algorithm.png)
