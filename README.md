@@ -23,7 +23,7 @@ The CT we are using is rated at 100A, so it’s suitable for measuring the total
 ![Current transformer](./ct.webp)
 
 ## Analog to Digital Conversion
-The Arduino Nano Every is based on the ATMega4809 microcontroller, which has a 10-bit (0 – 1023) Analogue to Digital Converter (ADC) for measuring voltages between 0V and 5V. This gives a resolution of 4.9mV per division which is quite sensitive:
+Let's take for instance we are using an Arduino UNO, which has a 10-bit (0 – 1023) Analogue to Digital Converter (ADC) for measuring voltages between 0V and 5V. This gives a resolution of 4.9mV per division which is quite sensitive:
 
 5000mV / 1024 = 4.88mV
 
