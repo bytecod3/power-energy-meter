@@ -1,9 +1,15 @@
-<mxfile host="Electron" modified="2023-07-25T06:22:07.597Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.5.1 Chrome/112.0.5615.204 Electron/24.6.0 Safari/537.36" etag="KV8SQ2W9k7QF3eyxik6S" version="21.5.1" type="device">
+<mxfile host="Electron" modified="2023-07-29T20:17:58.503Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.5.1 Chrome/112.0.5615.204 Electron/24.6.0 Safari/537.36" etag="VRDzNnj2rVhZNqGJDibB" version="21.5.1" type="device">
   <diagram name="Page-1" id="AaUq_ZtWOVlTvAVf8FJu">
-    <mxGraphModel dx="1999" dy="1229" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3171" dy="1414" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="z7cpHbuFiQcaJVe0481w-37" value="" style="whiteSpace=wrap;html=1;fontSize=16;fillColor=#fad9d5;strokeColor=#ae4132;" vertex="1" parent="1">
+          <mxGeometry x="-1547" y="1273" width="732" height="507" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-19" value="" style="whiteSpace=wrap;html=1;fontSize=16;fillColor=#bac8d3;strokeColor=#23445d;" vertex="1" parent="1">
+          <mxGeometry x="-565" y="1006" width="534" height="792" as="geometry" />
+        </mxCell>
         <mxCell id="3SbGRUDJCTW1QEdlGTZe-13" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" parent="1" source="3SbGRUDJCTW1QEdlGTZe-1" target="3SbGRUDJCTW1QEdlGTZe-7" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
@@ -138,47 +144,145 @@
         <mxCell id="3SbGRUDJCTW1QEdlGTZe-40" value="Data Logger (SD Card)" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=12;fontColor=#333333;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
           <mxGeometry x="12" y="410" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-9" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" edge="1" parent="1" source="ua16fLV8MAHk03jjQN-O-1" target="ua16fLV8MAHk03jjQN-O-2">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-9" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" source="ua16fLV8MAHk03jjQN-O-1" target="ua16fLV8MAHk03jjQN-O-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-1" value="Read Analog Value of voltage across the burdern resistor&lt;br&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-1" value="Read Analog Value of voltage across the burdern resistor&lt;br&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="898" y="389" width="145" height="96" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-10" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" edge="1" parent="1" source="ua16fLV8MAHk03jjQN-O-2" target="ua16fLV8MAHk03jjQN-O-3">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-10" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" source="ua16fLV8MAHk03jjQN-O-2" target="ua16fLV8MAHk03jjQN-O-3" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-2" value="Add DC bias to the reading&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-2" value="Add DC bias to the reading&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="1149" y="389" width="143" height="96" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-11" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" edge="1" parent="1" source="ua16fLV8MAHk03jjQN-O-3" target="ua16fLV8MAHk03jjQN-O-4">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-11" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" source="ua16fLV8MAHk03jjQN-O-3" target="ua16fLV8MAHk03jjQN-O-4" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-3" value="Low-Pass Filter to remove the DC signal from the AC signal" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-3" value="Low-Pass Filter to remove the DC signal from the AC signal" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="1375" y="389" width="148" height="94" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-12" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.425;entryY=0.01;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" edge="1" parent="1" source="ua16fLV8MAHk03jjQN-O-4" target="ua16fLV8MAHk03jjQN-O-5">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-12" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.425;entryY=0.01;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" source="ua16fLV8MAHk03jjQN-O-4" target="ua16fLV8MAHk03jjQN-O-5" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-4" value="Square each value to remove negative values" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-4" value="Square each value to remove negative values" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="1632" y="389" width="150" height="91" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-13" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" edge="1" parent="1" source="ua16fLV8MAHk03jjQN-O-5" target="ua16fLV8MAHk03jjQN-O-6">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-13" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" source="ua16fLV8MAHk03jjQN-O-5" target="ua16fLV8MAHk03jjQN-O-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-5" value="Scale this reading to get the RMS voltage across the burder resistor&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-5" value="Scale this reading to get the RMS voltage across the burder resistor&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="1638" y="585" width="160" height="102" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-14" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" edge="1" parent="1" source="ua16fLV8MAHk03jjQN-O-6" target="ua16fLV8MAHk03jjQN-O-8">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-14" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" source="ua16fLV8MAHk03jjQN-O-6" target="ua16fLV8MAHk03jjQN-O-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-6" value="Multiply by the current ratio to get the primary RMS current" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-6" value="Multiply by the current ratio to get the primary RMS current" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="1384" y="581.5" width="158" height="109" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-8" value="Power(W) = Primary RMS Voltage x Primary RMS current" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-8" value="Power(W) = Primary RMS Voltage x Primary RMS current" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="1100" y="593" width="176" height="92" as="geometry" />
         </mxCell>
-        <mxCell id="ua16fLV8MAHk03jjQN-O-15" value="&lt;b&gt;&lt;font color=&quot;#ff0000&quot; style=&quot;font-size: 27px;&quot;&gt;Conversion algorithm&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+        <mxCell id="ua16fLV8MAHk03jjQN-O-15" value="&lt;b&gt;&lt;font color=&quot;#ff0000&quot; style=&quot;font-size: 27px;&quot;&gt;Conversion algorithm&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="1212" y="303" width="297" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-1" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Payment flow diagram&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;strokeWidth=2;perimeterSpacing=4;" vertex="1" parent="1">
+          <mxGeometry x="-876" y="910" width="196" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-17" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.16;entryY=0.55;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-2" target="z7cpHbuFiQcaJVe0481w-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-2" value="Customer makes a payment via MPESA" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="-941.5" y="1092" width="131" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-21" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.342;entryY=-0.01;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-3" target="z7cpHbuFiQcaJVe0481w-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-3" value="Start" style="ellipse;whiteSpace=wrap;html=1;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="-936" y="964" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-16" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.005;entryY=0.34;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;exitX=0.875;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-4" target="z7cpHbuFiQcaJVe0481w-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-4" value="MPESA API" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;strokeColor=#666666;gradientColor=#b3b3b3;" vertex="1" parent="1">
+          <mxGeometry x="-740" y="1076" width="153" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-10" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-5" target="z7cpHbuFiQcaJVe0481w-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-5" value="Create a database entry for this new payment" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-447" y="1088" width="264" height="106" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-12" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-6" target="z7cpHbuFiQcaJVe0481w-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-6" value="Calculate the number of units to disburse to the customer based on the aount they have paid&lt;br&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-447" y="1262" width="262" height="116" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-13" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-7" target="z7cpHbuFiQcaJVe0481w-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-7" value="Update database with the number of units disbursed for this customer" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-447" y="1458" width="261" height="99" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-15" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.96;entryY=0.7;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-8" target="z7cpHbuFiQcaJVe0481w-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-8" value="Compose an payment confirmation message and send it via HTTP" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-447" y="1641" width="263" height="117" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-27" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;exitX=0.098;exitY=0.628;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-9" target="z7cpHbuFiQcaJVe0481w-22">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-838.5239999999999" y="1698.2800000000002" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-9" value="Transmit reply &lt;br&gt;message" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;strokeColor=#666666;gradientColor=#b3b3b3;" vertex="1" parent="1">
+          <mxGeometry x="-798" y="1623" width="204" height="113" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-20" value="&lt;font color=&quot;#0000cc&quot; style=&quot;font-size: 19px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Web Application&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="-398.5" y="1026" width="166" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-28" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#fff2cc;gradientColor=#ffd966;strokeColor=#d6b656;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-22" target="z7cpHbuFiQcaJVe0481w-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-22" value="Meter receives the confirmation message" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#fff2cc;gradientColor=#ffd966;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="-1228" y="1662.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-30" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-23" target="z7cpHbuFiQcaJVe0481w-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-23" value="Decode this confirmation message" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" vertex="1" parent="1">
+          <mxGeometry x="-1465" y="1481.5" width="173" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-34" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-24" target="z7cpHbuFiQcaJVe0481w-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-24" value="Extract number of units bought" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" vertex="1" parent="1">
+          <mxGeometry x="-1471" y="1358.5" width="179" height="93" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-29" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#fff2cc;gradientColor=#ffd966;strokeColor=#d6b656;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-26" target="z7cpHbuFiQcaJVe0481w-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-26" value="Confirm that this message is meant for this meter by checking the meter ID" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#fff2cc;gradientColor=#ffd966;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="-1467" y="1630.5" width="183" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-35" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-31" target="z7cpHbuFiQcaJVe0481w-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-31" value="Update the firmaware with the new number of units" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" vertex="1" parent="1">
+          <mxGeometry x="-1210.5" y="1348" width="225" height="114" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-36" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" edge="1" parent="1" source="z7cpHbuFiQcaJVe0481w-32" target="z7cpHbuFiQcaJVe0481w-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-32" value="Turn the power back on" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" vertex="1" parent="1">
+          <mxGeometry x="-1209.5" y="1498.5" width="224" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-33" value="Stop" style="ellipse;whiteSpace=wrap;html=1;fontSize=16;fillColor=#fff2cc;strokeColor=#d6b656;gradientColor=#ffd966;" vertex="1" parent="1">
+          <mxGeometry x="-928" y="1505.5" width="84" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z7cpHbuFiQcaJVe0481w-38" value="&lt;font color=&quot;#0000cc&quot;&gt;&lt;span style=&quot;font-size: 19px;&quot;&gt;&lt;b&gt;Device Firmware&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="-1284" y="1279" width="169" height="35" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
