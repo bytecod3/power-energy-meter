@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use PhpMqtt\Client\ConnectionSettings;
+use Illuminate\Queue\Events\Looping;
+use \PhpMqtt\Client\ConnectionSettings;
 use \PhpMqtt\Client\MqttClient;
 
 class UnitController extends Controller
@@ -17,7 +18,6 @@ class UnitController extends Controller
     public $password = 'public';
     public $clean_session = false;
     public $mqtt_version = MqttClient::MQTT_3_1_1;
-
 
     /**
      * Return data about a given meter unit
@@ -41,18 +41,19 @@ class UnitController extends Controller
         printf('client connected \n');
 
         // subscribe to the given topic
-        $mqtt->subscribe('emqx/test', function ($topic, $message){
-            // save the data recevied into the database ad update the UI
+        $mqtt->subscribe('power/meter', function ($topic, $message){
+            // save the data received into the database ad update the UI
             
             printf('Received message on topic [%s]: %s\n', $topic, $message);
         }, 0);
+    
 
     }
 
     public function show(Request $request){
 
-        // receive mqtt message
-
+        // subscribe to mqtt topic
+        $this->connect_to_broker();
 
 
         return view('units.show')->with([

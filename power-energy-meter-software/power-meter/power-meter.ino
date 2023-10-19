@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <WiFi.h>
+#include <PubSubClient.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Fonts/FreeMonoBold18pt7b.h>
@@ -13,15 +14,43 @@
 #define MAX_ADC_ESP 4095  /* max ADC value for ESP32 - 12 bit ADC */
 #define MAX_ADC_VOLTAGE_ESP 3.3
 #define ESP_DIVIDER 1.65
+#define SENSOR_POLL_TIME 2000 // poll sensors every 2 seconds 
 
 #define ESP 1 /* set to 0 when testing with arduino board */
+#define DEBUG 1
+#if DEBUG
+#define debug(x) Serial.print(x)
+#define debugln(x) Serial.println(x)
+#define debugf(x, y) Serial.printf(x, y)
+
+#else 
+
+#define debug(x) 
+#define debugln(x)
+#define debugf(x, y)
+
+#endif
+
+/* MQTT variables */
+#define MESSAGE_LENGTH 100
+#define MQTT_RETRY_TIME 100 // try reconnecting for 100ms
+char mqtt_msg[MESSAGE_LENGTH];
+unsigned long last_reconnect_attempt = 0;
+unsigned long previous_millis = 0;
+const char* topic = "power/meter";
+String sensor_data = "";
+const char* mqtt_broker = "broker.emqx.io";
+const int mqtt_port = 1883;
+const char* mqtt_client_name = "POWER_ESP";
+WiFiClient esp_client;
+PubSubClient client(esp_client);
 
 /* wifi credentials */
 #define WIFI_RETRY_TIME 50
-const char* ssid = "Gakibia-Unit3";
-const char* password = "password";
+const char* ssid = "Boen";
+const char* password = "12345678";
 
-uint8_t power_watt = 0;
+double power_watt = 0;
 double pp_voltage = 0; /* peak to peak voltage */
 double v_rms = 0;
 double a_rms = 0;
@@ -30,9 +59,37 @@ double voltage = 240.00;
 /* Oled screen variables */
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
-#define OLED_RESET (-1)
+#define OLED_RESET 4
 #define SCREEN_ADDRESS 0x3C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+/* MQTT conection parameters */
+void initialize_mqtt(){
+  client.setServer(mqtt_broker, mqtt_port);
+  debugln("Connecting to broker..");
+
+  while(!client.connected()){
+    debug("...");
+    client.connect(mqtt_client_name);
+    delay(MQTT_RETRY_TIME);
+  }
+
+  // at this point the broker is connected
+  debugln("Connected to broker!");
+  
+}
+
+bool reconnect(){
+  if(client.connect(mqtt_client_name)){
+    debugln("Reconnecting to MQTT broker...");
+  } else {
+    debug("Failed...");
+    debugln(client.state());
+  }
+
+  return client.connected();
+}
+
 
 float calculate_peak_voltage(){
   float converted_voltage;
@@ -73,72 +130,112 @@ float calculate_peak_voltage(){
 
 /* initialize oled screen */
 void initialize_oled(){
-  if(!display.begin(SSD1306_SWITCb HCAPVCC, SCREEN_ADDRESS)){
-    Serial.println("[-]ERR: Display allocation failed!");
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)){
+    debugln("[-]ERR: Display allocation failed!");
     for(;;);
   }
   
-  // allocation succeeded
-  display.clearDisplay();
+  // allocation succeeded - buffer initial contents
+  debugln("display found");
 }
 
 /* draw text on the screen */
 void update_screen(double message){
   display.clearDisplay();
-  display.setFont(&FreeMono9pt7b);
   display.setCursor(0,0);
   display.println(message);
+  display.display();
 }
 
 /* connect to WIFI */
 void connect_to_wifi(){
   /* try connecting */
-  Serial.println("[+]Scanning for network...");
+  debugln("[+]Scanning for network...");
 
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED){
     /* try reconnecting */
     delay(WIFI_RETRY_TIME);
-    Serial.println("[+]Scanning for network...");
+    debugln("[+]Scanning for network...");
   }
 
-  Serial.println("[+]Network found");Serial.print("[+]IP address: ");
-  Serial.println(WiFi.localIP());
+  debugln("[+]Network found");debug("[+]IP address: ");
+  debugln(WiFi.localIP());
+}
+
+void read_and_publish_data(){
+  pp_voltage = calculate_peak_voltage();
+  v_rms = (pp_voltage / ESP_DIVIDER ) * 0.707;  /* divide by 2.5 for 5V ADC */
+  a_rms = (v_rms * 1000) / mv_per_amp;
+
+  debug(a_rms);
+  debugln("A RMS");
+
+  power_watt = (a_rms * voltage);
+  debug(power_watt);
+  debugln(" W");
+
+  /* publish data to MQTT broker */
+  // create MQTT message
+  if(snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f", a_rms, power_watt) > sizeof(mqtt_msg)){
+    debugln("mqtt message size too long");
+  }
+
+  // publish the data
+  if(client.publish(topic, mqtt_msg)){
+    debugln("Data published");
+  } else {
+    debugln("Failed to publish");
+  }
 }
 
 void setup() {
 
   /* initialize serial monitor */
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   /* initialise GSM */
 
   /* initialize OLED screen */
   initialize_oled();
+  display.setCursor(0,0);
+  display.println("Hello there...");
+  display.display();
 
   /* intitialize WIFI */
   connect_to_wifi();
+  initialize_mqtt();
 
   /* set up GPIO pins */
-  pinMode(current_sensor_pin, INPUT);
-  
+  pinMode(current_sensor_pin, INPUT); 
 }
 
 void loop() {
-  Serial.println("");
-  pp_voltage = calculate_peak_voltage();
-  v_rms = (pp_voltage / ESP_DIVIDER ) * 0.707;  /* divide by 2.5 for 5V ADC */
-  a_rms = (v_rms * 1000) / mv_per_amp;
 
-  Serial.print(a_rms);
-  Serial.println("A RMS");
+  if(!client.connected()){
+    debugln("Client not connected...");
+    unsigned long now = millis();
 
-  power_watt = (a_rms * voltage);
-  Serial.print(power_watt);
-  Serial.println(" W");
+    if(now - last_reconnect_attempt > MQTT_RETRY_TIME){
+      last_reconnect_attempt = now;
 
-  /* update readings on screen */
-  display.println(a_rms);
+      if(reconnect()){
+        debugln("Reconnected...");
+        last_reconnect_attempt = 0;
+      }
+      
+    }
+  } else {
+    client.loop();
+    unsigned long current_millis = millis();
+
+    if(current_millis - previous_millis >= SENSOR_POLL_TIME){
+      previous_millis = current_millis;
+
+      read_and_publish_data();
+    }
+  }
+
   
 }
