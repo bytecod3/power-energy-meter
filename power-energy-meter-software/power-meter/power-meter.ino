@@ -7,7 +7,7 @@
 #include <Fonts/FreeMono9pt7b.h>
 
 #define current_sensor_pin 36
-#define mv_per_amp 100  /* sensitivity for the 20A current sensor version */
+#define CURRENT_SENSITIVITY 100  /* sensitivity for the 20A current sensor version */
 #define sample_time 1000 /* sample the current for 1 second */
 #define MAX_ADC 1023 /* max ADC value for Arduino - 8 bit ADC value */
 #define MAX_ADC_VOLTAGE 5
@@ -90,6 +90,56 @@ bool reconnect(){
   return client.connected();
 }
 
+const int no_of_samples = 500;
+long int sensorValue = 0;
+float voltage_reference = 3.3;
+float v_ref = 1000; // value without any load - todo: calibrate to get this value
+
+void read_current_sensor(){
+  // read the value 500 times
+  for(int i=0; i<no_of_samples; i++){
+    sensor_value += analogRead(current_sensor_pin);
+
+    // wait for 2ms before the next iteration
+    delay(2);
+  }
+
+  // average these 500 values
+  sensor_value = sensor_value / no_of_samples;
+
+  // on board ADC is 12 bits - 4095 - different power sources have different
+  // reference voltages 
+  // resolution = (vref)/(4095) 
+  float unit_value = (voltage_reference/4095) * 1000; // gives 0.805 mV
+  float voltage = unit_value * sensor_value;
+
+  // when no load, v_ref = initial value
+  debug("Initial value: ");
+  debug(voltage);
+  debug(" mV");
+  debugln();
+
+  // calculate the corresponding current
+  float current = (voltage - v_ref) * CURRENT_SENSITIVITY; 
+
+  // print pin voltage - will help in callibrating
+  // comment this line before using it - to get v_ref
+  float pin_voltage = unit_value*sensor_value - v_ref; // why use v_ref before measuring it?
+  debug(voltage);
+  debugln(" mV");
+    
+  // print current
+  debug(current);
+  debug(" mA");
+  debugln();
+
+  // reset sensor value for next reading
+  sensor_value = 0;
+
+  // read sensor value every 2 seconds 
+  delay(2000); // use millis() here
+  
+}
 
 float calculate_peak_voltage(){
   float converted_voltage;
