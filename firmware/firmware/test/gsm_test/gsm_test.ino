@@ -1,59 +1,115 @@
 
-/*============================GSM VARIABLES=============================*/
-#define RXD2 16
-#define TXD2 17
+//#include <SoftwareSerial.h>
+
+//sender phone number with country code
+//const String PHONE = "+ZZxxxxxxxxxx";//For only 1 default number user
+String PHONE = ""; //For Multiple user
+String msg;
+String units;
+
+//GSM Module RX pin to Arduino 3
+//GSM Module TX pin to Arduino 2
+#define rxPin 16
+#define txPin 17
+//SoftwareSerial sim800(txPin, rxPin);
+
+#define LED_PIN 13
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-  gsm_init();
-
-}
-
-void loop() {
-  // poll for SMS
-  gsm_update_serial(); // todo: change this method
-
-}
-
-/**
- * Init GSM module
- * 
- */
-void gsm_init(){
-  // init hardware serial format: Serial.begin(baud_rate, protocol, RX pin, TX pin)
-  Serial.println("[...]Initializing hardware serial 2");
+  pinMode(LED_PIN, OUTPUT); //Setting Pin 13 as output
+  digitalWrite(LED_PIN, LOW);
   delay(1000);
-  Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
-  Serial.println("Serial 2 initialized!");
 
-  // perform handshake
-  Serial.println("Attempting handshake...");
-  Serial2.println("AT"); // will return OK if handshake sucessful
-  gsm_update_serial();
+  Serial.begin(115200);
+  Serial.println("Initializing Serial... ");
 
-  // configure text mode
-  Serial.println("Configuring text mode...");
-  Serial2.println("AT+CMGF=1"); 
-  gsm_update_serial();
+  Serial2.begin(115200);
+  Serial.println("Initializing GSM module...");
 
-  // define how newly received SMS should be handled
-  Serial2.println("AT+CNMI=1,2,0,0,0");
+  Serial2.print("AT+CMGF=1\r"); //SMS text mode
+  delay(1000);
+}
+
+void loop()
+{
+  while (Serial2.available())
+  {
+    parseData(Serial2.readString());//Calls the parseData function to parse SMS
+  }
+  doAction();//Does necessary action according to SMS message
+  while (Serial.available())
+  {
+    Serial2.println(Serial.readString());
+  }
 
 }
 
-/**
- * Send whatever is in Serial2 to Serial0(programming serial) for debugging and vice versa
- * 
- */
-void gsm_update_serial(){
-  delay(500);
-  while(Serial.available()){
-    Serial2.write(Serial.read()); // forward what programming serial receives to Serial2
+void parseData(String buff) {
+  Serial.println(buff);
+
+  unsigned int index;
+  unsigned int index_of_a;
+
+  //Remove sent "AT Command" from the response string.
+  index = buff.indexOf("\r");
+  buff.remove(0, index + 2);
+  buff.trim();
+
+  if (buff != "OK") {
+    index = buff.indexOf(":");
+    String cmd = buff.substring(0, index);
+    cmd.trim();
+
+    buff.remove(0, index + 2);
+
+    //Parse necessary message from SIM800L Serial buffer string
+    if (cmd == "+CMT") {
+      //get newly arrived memory location and store it in temp
+      index = buff.lastIndexOf(0x0D);//Looking for position of CR(Carriage Return)
+      msg = buff.substring(index + 2, buff.length());//Writes message to variable "msg"
+      msg.toLowerCase();//Whole message gets changed to lower case
+      Serial.println(msg);
+      
+      // extract the number of units
+      index_of_a = msg.indexOf('a'); // last comma is where the string "amt" starts
+      units = msg.substring(46, index_of_a);
+      
+      index = buff.indexOf(0x22);//Looking for position of first double quotes-> "
+      PHONE = buff.substring(index + 1, index + 14); //Writes phone number to variable "PHONE"
+      //Serial.println(PHONE);
+      Serial.println(units);
+
+    }
+  }
+}
+
+void doAction()
+{
+
+  if (msg == "led on")
+  {
+    digitalWrite(LED_PIN, HIGH);
+    Reply("LED is ON");
+  }
+  else if (msg == "led off")
+  {
+    digitalWrite(LED_PIN, LOW);
+    Reply("LED is OFF");
   }
 
-  while(Serial2.available()){
-    Serial.write(Serial2.read()); // forward what serial2 recieves to programming serial for debug
-  }
+  PHONE = "";//Clears phone string
+  msg = "";//Clears message string
+}
 
+void Reply(String text)
+{
+  Serial2.print("AT+CMGF=1\r");
+  delay(1000);
+  Serial2.print("AT+CMGS=\"" + PHONE + "\"\r");
+  delay(1000);
+  Serial2.print(text);
+  delay(100);
+  Serial2.write(0x1A); //ascii code for ctrl+z, DEC->26, HEX->0x1A
+  delay(1000);
+  Serial.println("SMS Sent Successfully.");
 }

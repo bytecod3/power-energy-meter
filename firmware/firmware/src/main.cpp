@@ -43,10 +43,11 @@ unsigned long ACS_sample_interval;
 /*===========================TOKEN CONVERSION VARIABLES===================*/
 String msg;
 String PHONE = "";
-int unit_value = 1000; // 1 token is 1kWhg
+int unit_value = 1000; // 1 token is 1 kWh
 String meter_id = "";
 String token;
 String units;
+int received_units; // units received from sms
 String amount;
 /*=============================BUZZER VARIABLES===========================*/
 #define BUZZ_TIME 150
@@ -68,10 +69,10 @@ void mqtt_init();
 bool mqtt_reconnect();
 void mqtt_publish();
 void wifi_connect();
-void gsm_receive();
 void gsm_action();
 void gsm_parse(String);
 void alert();
+int read_serial(int, char*,int);
 
 // function definitions
 float readCurrent() {
@@ -119,11 +120,9 @@ float readCurrent() {
     // reset the sensor_value for the next reading 
     sensor_value = 0;
 
-
     // update the timing for the next loop
     ACS_previous_sample_time = ACS_current_sample_time;
 
-    
   }
 
   return current;
@@ -201,83 +200,9 @@ void wifi_connect(){
   debugln(WiFi.localIP());
 }
 
-/**
- * Send whatever is in Serial2 to Serial0(programming serial) for debugging and vice versa
- * 
- */
-void gsm_update_serial(){
-  delay(500);
-  while(Serial.available()){
-    Serial2.write(Serial.read()); // forward what programming serial receives to Serial2
-  }
-
-  while(Serial2.available()){
-    Serial.write(Serial2.read()); // forward what serial2 recieves to programming serial for debug
-  }
-
-}
-
-/**
- * Init GSM module
- * 
- */
-void gsm_init(){
-  
-  // perform handshake
-  Serial2.println("AT"); // will return OK if handshake sucessful
-  // gsm_update_serial();
-  gsm_receive();
-
-  // configure text mode
-  Serial2.println("AT+CMGF=1"); 
-  // gsm_update_serial();
-  gsm_receive();
-
-  // define how newly received SMS should be handled
-  Serial2.println("AT+CNMI=1,2,0,0,0");
-  gsm_receive();
-
-}
-
-
-/**
- * Set susbstring
- * 
- */
-void get_substring(char string[], char substring[], int position, int length)
-{
-  int c = 0;
-
-  while (c < length)
-  {
-    substring[c] = string[position + c - 1];
-    c++;
-  }
-
-  substring[c] = '\0';  
-
-}
-
-/**
- * Receive and decode GSM message
- * 
- */
-void gsm_receive(){
-  while(Serial2.available()){
-    //Serial.write(Serial2.read()); // forward what serial2 receives to programming serial for debug
-    gsm_parse(Serial2.readString()); // parse the sms
-  }
-
-  // gsm_action();
-
-  while(Serial.available()){
-    Serial2.println(Serial.readString()); // forward what programming serial receives to Serial2
-  }
-
-}
-
 void gsm_parse(String buff){
   // Serial.println(buff);
+
   unsigned int index;
   unsigned int index_of_a;
 
@@ -286,9 +211,10 @@ void gsm_parse(String buff){
   buff.remove(0, index + 2);
   buff.trim();
 
-  if(buff !="OK"){
+  if(buff != "OK"){
     index = buff.indexOf(":");
     String cmd = buff.substring(0, index);
+    cmd.trim();
 
     buff.remove(0, index + 2);
 
@@ -306,38 +232,67 @@ void gsm_parse(String buff){
       // amount = msg.substring(0, 10);
 
       // extract the number of units
-      // index_of_a = msg.indexOf('a'); // last comma is where the string "amt" starts
-      // units = msg.substring(47, index_of_a);
+      index_of_a = msg.indexOf('a'); // last comma is where the string "amt" starts
+      units = msg.substring(46, index_of_a);
 
-      //index = buff.indexOf(0X22); // looking for position of the first double quotes
-
-      // extract the phone number
-      //PHONE = buff.substring(index + 1, index + 14);
+      index = buff.indexOf(0X22); // looking for position of the first double quotes
+      PHONE = buff.substring(index + 1, index + 14); // extract the phone number
 
       // debug extracted variables
       // Serial.println(PHONE);
-      Serial.println(msg);
-      // Serial.println(amount);
       // Serial.println(units);
+
     }
   }
 
 }
+
 
 /**
  * Act depending on the GSM message
  * 
  */
 void gsm_action(){
-  if(msg == "buzz"){
-    alert();
-  }
+  // if (msg == "led on")
+  // {
+  //   digitalWrite(LED_PIN, HIGH);
+  //   Reply("LED is ON");
+  // }
+  // else if (msg == "led off")
+  // {
+  //   digitalWrite(LED_PIN, LOW);
+  //   Reply("LED is OFF");
+  // }
 
-  // reset variables
-  PHONE = ""; // clear the pone string
-  msg = ""; // clear the message string
-  amount = "";
+  // update units 
+  units = atoi(units.c_str());
+  received_units = atoi(units.c_str());
+
+  
+
+  PHONE = "";//Clears phone string
+  msg = "";//Clears message string
+  // units = ""; // clears the units string
 }
+
+/**
+ * @brief Reply sms
+ * 
+ * @param text 
+ */
+void gsm_reply(String text)
+{
+  Serial2.print("AT+CMGF=1\r");
+  delay(1000);
+  Serial2.print("AT+CMGS=\"" + PHONE + "\"\r");
+  delay(1000);
+  Serial2.print(text);
+  delay(100);
+  Serial2.write(0x1A); //ascii code for ctrl+z, DEC->26, HEX->0x1A
+  delay(1000);
+  Serial.println("SMS Sent Successfully.");
+}
+
 
 /**
  * calculate units
@@ -391,43 +346,100 @@ void relay_turn_on(){
  */
 void oled_init(){
   // configure screen
-    display.setColorIndex(1);  // set the color to white
-    display.drawStr(0,0, "Power Meter");
-    display.begin();
+  display.begin();
 }
 
-/**
- * show oled default oled screen
- * show the instantaneous current, voltage and power 
- * 
- */
-void oled_default_screen(){
+void oled_show_message(String msg){
   display.setFont(u8g2_font_10x20_mr);
-  display.drawStr(0,0, "Power Meter");
+  
+  display.firstPage();
+  do {
+    display.setFont(u8g2_font_helvR14_tr);
+    display.drawStr(0,50, msg.c_str());
+
+  } while ( display.nextPage() );
   
 }
 
+/**
+ * show message on screen
+ * 
+ */
+void oled_hello(){
+  oled_show_message("Booting...");
+  delay(1000);
+  
+}
+
+/**
+ * @brief Default screen when running
+ * 
+ * @param msg - power calculated from measured current
+ */
+void oled_default_screen(String msg){
+  //display.clearDisplay();
+  display.setFont(u8g2_font_10x20_mr);
+  
+  display.firstPage();
+  do {
+    display.setFont(u8g2_font_helvR14_tr);
+    display.drawStr(0,16, "Power");
+    display.drawStr(0,50, msg.c_str());
+
+    display.drawStr(30, 50, "kWh");
+
+  } while ( display.nextPage() );
+  
+}
+
+/**
+ * screen to show when a message is received by GSM
+ * 
+ */
+void oled_message_received(){
+  oled_show_message("Message received...");
+
+  delay(1000);
+  
+  oled_show_message("Updating units...");
+
+  delay(1000);
+
+  oled_show_message("Updating units...");
+
+  delay(700);
+
+}
+
+/**
+ * Setup
+ * 
+ */
 void setup() {
 
   // pinmodes
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(ALERT_LED, OUTPUT);
-  
-  // init serial 
-  Serial.begin(115200);
-  // init hardware serial format: Serial.begin(baud_rate, protocol, RX pin, TX pin)
-  debugln("Initializing hardware serial 2...");
-  Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
-  delay(1000);
-  debugln("Serial 2 ready!");
-  // init GSM
-  gsm_init();
 
   // int oled
   oled_init();
 
+  // flash oled hello
+  oled_hello();
+
   // alert
-  // alert();
+  alert();
+  
+  // init serial 
+  debugln("[+]Initializing hardware serial 1");
+  Serial.begin(115200);
+  delay(1000);
+
+  Serial2.begin(115200);
+  Serial.println("[+]Initializing GSM module...");
+
+  Serial2.print("AT+CMGF=1\r"); //SMS text mode
+  delay(1000);
 
 }
 
@@ -461,15 +473,22 @@ void loop() {
 
   //  }
 
-   // poll for SMS
-  //  gsm_update_serial(); // todo: change this method
-
-  gsm_receive();
-  // gsm_decode_sms(received_message_buffer);
-
-  // Serial.println(meter_id);
-
   // update screen
-  oled_default_screen();
+  oled_default_screen("32");
+
+  while (Serial2.available())
+  {
+    gsm_parse(Serial2.readString());//Calls the parseData function to parse SMS
+  }
+  gsm_action();//Does necessary action according to SMS message
+
+  while (Serial.available())
+  {
+    Serial2.println(Serial.readString());
+  }
+
+  // perform units(tokens) conversion
+  debugln(received_units);
+  
 
 }
