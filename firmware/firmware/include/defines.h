@@ -2,7 +2,7 @@
 #define DEFINES_H
 
 /*========================PINS==========================================*/
-#define CURRENT_SENSOR_PIN 4 // current sensor pin
+#define CURRENT_SENSOR_PIN 32 // current sensor pin
 #define BUZZER_PIN 25
 #define RELAY 5
 
@@ -11,6 +11,9 @@
 
 /*=======================ADC CONVERSION VARIABLES ========================*/
 #define REFERENCE_VOLTAGE 3.3
+#define RMS_VOLTAGE 230
+
+#define UNIT_THRESHOLD 2
 
 /*======================METER PARAMETERS=============================*/
 const char* device_meter_id = "M01-1234-5678";

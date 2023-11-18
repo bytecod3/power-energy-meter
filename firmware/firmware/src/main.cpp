@@ -2,13 +2,11 @@
 #include <PubSubClient.h>
 #include <WiFi.h>
 #include <U8g2lib.h>
+#include "../lib/Filters/Filters.h"
 #include "defines.h"
 
 /*=================CURRENT SENSOR VARIABLES===============================*/
 const int average_value = 500; // take avg of 500 samples
-long int sensor_value = 0;
-float sensitivity = 1000.0/200.0; // 1000mA per 200mV
-float v_ref = 1508;
 float power_watt = 0;
 float v_rms = 230.0; // default RMS voltage 
 
@@ -28,10 +26,10 @@ PubSubClient client(esp_client);
 
 /*==========================wifi credentials========================*/
 #define WIFI_RETRY_TIME 50
-const char* ssid = "Boen";
-const char* password = "12345678";
+const char* ssid = "Gakibia-Unit3";
+const char* password = "password";
 
-/*======================TIMING VARiABLES==================================*/
+/*======================TIMING VARIABLES==================================*/
 unsigned long ACS_current_sample_time = 0, ACS_previous_sample_time = 0;
 unsigned long ACS_sample_interval;
 #define SENSOR_POLL_TIME 2000
@@ -49,6 +47,16 @@ String token;
 String units;
 int received_units; // units received from sms
 String amount;
+unsigned long load_turn_on_time = 0; // exact time the load is turned on
+unsigned long current_time = 0;
+char relay_on_off_flag = 0; // flag to tell whether the relay(load) is on or off
+float consumed_units = 0;
+float remaining_units = 0;
+float elapsed_time_hrs;
+unsigned long elapsed_time = 0;
+float power_kw = 0;
+float power_kwh = 0;
+
 /*=============================BUZZER VARIABLES===========================*/
 #define BUZZ_TIME 150
 
@@ -74,60 +82,47 @@ void gsm_parse(String);
 void alert();
 int read_serial(int, char*,int);
 
-// function definitions
-float readCurrent() {
+/*==========================CURRENT READING VARIABLES=========================*/
 
-  ACS_current_sample_time = millis(); // get current time
-  float current;
+//#define ACS_Pin A0                        //Sensor data pin on A0 analog   input
 
-  if(ACS_current_sample_time - ACS_previous_sample_time > ACS_sample_interval){
-    // take average of 500 readings every 1 second
+float ACS_Value;                              //Here we keep the raw   data valuess
+float testFrequency = 50;                    // test signal frequency   (Hz)
+float windowLength = 40.0/testFrequency;     // how long to average the   signal, for statistist
 
-    for(int i = 0; i < average_value; i++){
-      sensor_value += analogRead(CURRENT_SENSOR_PIN);
+float intercept = 0; // to be adjusted based   on calibration testing
+float slope = 0.0752; // to be adjusted based on calibration   testing
+                      //Please check the ACS712 Tutorial video by SurtrTech   to see how to get them because it depends on your sensor, or look below
 
-      // wait for 2 ms before the next loop
-      delay(2);
-    }
+float   Amps_TRMS; // estimated actual current in amps
 
-    // find the average of the values 
-    sensor_value = sensor_value / average_value;
+unsigned long printPeriod   = 1000; // in milliseconds
+// Track time in milliseconds since last reading 
+unsigned   long previousMillis = 0;
 
-    // the on-board ADC is 12 bits
-    // for esp32, 2^12 = 4096, so 3.3V / 4095 ~= 0.8mV
-    // unit value = 3.3 / 4096 * 1000 = 0.8 
+// float read_curr(){
+//   RunningStatistics inputStats;                 // create statistics   to look at the raw test signal
+//   inputStats.setWindowSecs( windowLength );     //Set   the window length
+     
+//   while( true ) {   
+//     ACS_Value = analogRead(CURRENT_SENSOR_PIN);   // read the analog in value:
+//     inputStats.input(ACS_Value);  // log to Stats   function
+        
+//     if((unsigned long)(millis() - previousMillis) >= printPeriod)   { //every second we do the calculation
+//       previousMillis = millis();   //   update time
+      
+//       Amps_TRMS = intercept + slope * inputStats.sigma();
 
-    float unit_value = (REFERENCE_VOLTAGE / 4096) * 1000; // resolution
-    float voltage = unit_value * sensor_value;
+//        Serial.print( "Amps: " ); 
+//       Serial.print( Amps_TRMS );
+//       Serial.println();
 
-    // when no load, v_ref = initial_value
-    debug("initial value: ");
-    debug(voltage);
-    debug(" mV");
+//      }
+//   }
+  
+// }
 
-    // calculate the corresponding current
-    current = (voltage - v_ref) * sensitivity;
-
-    // print display voltage(mV) voltage corresponding to the current
-    voltage = unit_value * sensor_value - v_ref;
-    debug(voltage);
-    debugln("mV");
-
-    // print current (mA)
-    debug(current);
-    debugln(" mA");
-
-    // reset the sensor_value for the next reading 
-    sensor_value = 0;
-
-    // update the timing for the next loop
-    ACS_previous_sample_time = ACS_current_sample_time;
-
-  }
-
-  return current;
-
-}
+/*================END OF CURRENT READING======================================*/
 
 /**
  * Initialize MQTT
@@ -135,7 +130,7 @@ float readCurrent() {
  */
 void initialize_mqtt(){
   client.setServer(mqtt_broker, mqtt_port);
-  debugln("Connecting to broker..");
+  debugln("[]Connecting to broker..");
 
   while(!client.connected()){
     debug("...");
@@ -144,7 +139,7 @@ void initialize_mqtt(){
   }
 
   // at this point the broker is connected
-  debugln("Connected to broker!");
+  debugln("[+]Connected to broker!");
   
 }
 
@@ -164,26 +159,7 @@ bool mqtt_reconnect(){
 }
 
 /**
- * Publish data to broker
- * 
- */
-void mqtt_publish(){
-  float a_rms = readCurrent(); // read the current from the current sensor
-
-  // create MQTT message
-  snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f", a_rms); // todo: check for correct length
-
-  if(client.publish(topic, mqtt_msg)){
-    debugln("[+]Data published");
-  } else {
-    debugln("[-]Failed to publish");
-  }
-
-}
-
-/**
  * Connect to WIFI
- * 
  */
 void wifi_connect(){
   debugln("[+]Scanning for network...");
@@ -268,8 +244,6 @@ void gsm_action(){
   units = atoi(units.c_str());
   received_units = atoi(units.c_str());
 
-  
-
   PHONE = "";//Clears phone string
   msg = "";//Clears message string
   // units = ""; // clears the units string
@@ -330,6 +304,15 @@ void alert(){
  */
 void relay_turn_off(){
   digitalWrite(RELAY, LOW);
+
+  // reset the relay_on_flag
+  if(relay_on_off_flag){
+    relay_on_off_flag = 0;
+  }
+
+  // reset the load turn on time for the next loop
+  load_turn_on_time = 0;
+
 }
 
 /**
@@ -338,6 +321,13 @@ void relay_turn_off(){
  */
 void relay_turn_on(){
   digitalWrite(RELAY, HIGH);
+
+  // set the load on flag to 1
+  relay_on_off_flag = 1;
+
+  // log the exact time that this device has been turned on
+  load_turn_on_time = millis(); 
+
 }
 
 /**
@@ -368,7 +358,6 @@ void oled_show_message(String msg){
 void oled_hello(){
   oled_show_message("Booting...");
   delay(1000);
-  
 }
 
 /**
@@ -389,7 +378,6 @@ void oled_default_screen(String msg){
     display.drawStr(30, 50, "kWh");
 
   } while ( display.nextPage() );
-  
 }
 
 /**
@@ -405,11 +393,54 @@ void oled_message_received(){
 
   delay(1000);
 
-  oled_show_message("Updating units...");
+  oled_show_message("Units updated...");
 
   delay(700);
 
 }
+
+  
+float calc_power_in_kwh(float current){
+  // current received is in Amperes
+  // calculate the power consumed in KW
+  power_kw = (RMS_VOLTAGE * current ) / 1000.0;
+
+  // get the time passed since the relay(load) was turned on
+  current_time = millis();
+  elapsed_time = current_time - load_turn_on_time;
+
+  // convert the time to hours
+  elapsed_time_hrs = elapsed_time / (1000 * 60 * 60);
+
+  // calculate the power in KWh
+  power_kwh = power_kw / elapsed_time_hrs;
+  consumed_units = power_kwh;
+
+  // power_kwh represents the units 
+  // calculate the remaining units
+  remaining_units = received_units - consumed_units;
+
+  return power_kwh;
+
+}
+
+/**
+ * Publish data to broker
+ * 
+ */
+void mqtt_publish(float current){
+
+  // create MQTT message
+  snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f", Amps_TRMS, power_kwh); // todo: check for correct length
+
+  if(client.publish(topic, mqtt_msg)){
+    debugln("[+]Data published");
+  } else {
+    debugln("[-]Failed to publish");
+  }
+
+}
+
 
 /**
  * Setup
@@ -417,9 +448,16 @@ void oled_message_received(){
  */
 void setup() {
 
+  // connect to wifi
+  wifi_connect();
+
+  // init mqtt
+  initialize_mqtt();
+
   // pinmodes
-  pinMode(BUZZER_PIN, OUTPUT);
+  // pinMode(BUZZER_PIN, OUTPUT);
   pinMode(ALERT_LED, OUTPUT);
+  pinMode(CURRENT_SENSOR_PIN, INPUT);
 
   // int oled
   oled_init();
@@ -445,41 +483,74 @@ void setup() {
 
 void loop() {
 
-  // read the current
-  //float current_rms = readCurrent();
+  RunningStatistics inputStats;                 // create statistics   to look at the raw test signal
+  inputStats.setWindowSecs( windowLength );     //Set   the window length
+    
 
-  //  if(!client.connected()){
-  //   debugln("[-]Client not connected...");
-  //   unsigned long now = millis();
-
-  //   if(now - last_reconnect_attempt > MQTT_RETRY_TIME){
-  //     last_reconnect_attempt = now;
-
-  //     if(mqtt_reconnect()){
-  //       debugln("[+]Reconnected...");
-  //       last_reconnect_attempt = 0;
-  //     }
+  ACS_Value = analogRead(CURRENT_SENSOR_PIN);   // read the analog in value:
+  inputStats.input(ACS_Value);  // log to Stats   function
       
-  //   }
-  //  } else {
-  //   client.loop();
-  //   unsigned long current_millis = millis();
+  if((unsigned long)(millis() - previousMillis) >= printPeriod)   { //every second we do the calculation
+    previousMillis = millis();   //   update time
+    
+    Amps_TRMS = intercept + slope * inputStats.sigma();
 
-  //   if(current_millis - previous_millis >= SENSOR_POLL_TIME){
-  //     previous_millis = current_millis;
+    Serial.print( "Amps: " ); 
+    Serial.print( Amps_TRMS );
+    Serial.println();
 
-  //     mqtt_publish();
-  //   }
+    // update reading on screen
+    oled_show_message((String) Amps_TRMS);
+    
+    // --------------------TRANSMIT TO MQTT------------------
+    if(!client.connected()){
+      debugln("[-]Client not connected...");
+      unsigned long now = millis();
 
-  //  }
+      if(now - last_reconnect_attempt > MQTT_RETRY_TIME){
+        last_reconnect_attempt = now;
 
-  // update screen
-  oled_default_screen("32");
+        if(mqtt_reconnect()){
+          debugln("[+]Reconnected...");
+          last_reconnect_attempt = 0;
+        }
+    }
+    } else {
+      client.loop();
+      unsigned long current_millis = millis();
+
+      if(current_millis - previous_millis >= SENSOR_POLL_TIME){
+        previous_millis = current_millis;
+
+        //mqtt_publish();
+
+        //----------------publish to mqtt
+        // create MQTT message
+        snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f", Amps_TRMS, power_kwh); // todo: check for correct length
+
+        if(client.publish(topic, mqtt_msg)){
+          debugln("[+]Data published");
+        } else {
+          debugln("[-]Failed to publish");
+        }
+
+      }
+
+    }
+
+    //-------------------------------------------------------
+
+  }
 
   while (Serial2.available())
   {
     gsm_parse(Serial2.readString());//Calls the parseData function to parse SMS
+
+    // TODO:update screen
+
+    // TODO:alert
   }
+
   gsm_action();//Does necessary action according to SMS message
 
   while (Serial.available())
@@ -489,6 +560,20 @@ void loop() {
 
   // perform units(tokens) conversion
   debugln(received_units);
-  
 
+  // find out whether the remaining units have gone below the threshold
+  if(remaining_units <= UNIT_THRESHOLD){
+    // TODO: ALERT 
+    alert();
+    oled_show_message("Low on units. Please recharge.");
+    delay(1000);
+
+    // TODO: SEND SMS TO NOTIFY 
+
+    // TODO: CUTOFF LOAD - consider cutting off load after units are all depleted
+    relay_turn_off();
+
+  }
 }
+//-------------------------END OF VOID LOOP--------------------------------
+
