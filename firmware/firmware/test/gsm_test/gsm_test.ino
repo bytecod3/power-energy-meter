@@ -27,16 +27,20 @@ void setup() {
   Serial.println("Initializing GSM module...");
 
   Serial2.print("AT+CMGF=1\r"); //SMS text mode
+  Serial2.print("AT+CNMI=2,2,0,0,0\r");
   delay(1000);
+
+//  Serial2.print("AT+CMGDA=DEL ALL\r");
 }
 
 void loop()
 {
   while (Serial2.available())
   {
-    parseData(Serial2.readString());//Calls the parseData function to parse SMS
+    //parseData(Serial2.readString());//Calls the parseData function to parse SMS
+    Serial.println(Serial2.readString());
   }
-  doAction();//Does necessary action according to SMS message
+  //doAction();//Does necessary action according to SMS message
   while (Serial.available())
   {
     Serial2.println(Serial.readString());

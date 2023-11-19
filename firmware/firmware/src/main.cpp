@@ -45,17 +45,17 @@ int unit_value = 1000; // 1 token is 1 kWh
 String meter_id = "";
 String token;
 String units;
-int received_units; // units received from sms
 String amount;
 unsigned long load_turn_on_time = 0; // exact time the load is turned on
 unsigned long current_time = 0;
-char relay_on_off_flag = 0; // flag to tell whether the relay(load) is on or off
-float consumed_units = 0;
-float remaining_units = 0;
-float elapsed_time_hrs;
+int relay_on_off_flag = 0; // flag to tell whether the relay(load) is on or off
+double received_units = 0; // units received from sms set to 5 initially
+double consumed_units = 0;
+double remaining_units;
+double elapsed_time_hrs;
 unsigned long elapsed_time = 0;
-float power_kw = 0;
-float power_kwh = 0;
+double power_kw = 0;
+double power_kwh = 0;
 
 /*=============================BUZZER VARIABLES===========================*/
 #define BUZZ_TIME 150
@@ -74,13 +74,15 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C display(/*R2: rotation 180*/U8G2_R0, /*reset
 // function prototypes
 float readCurrent(); 
 void mqtt_init();
-bool mqtt_reconnect();
+bool mqtt_reconnect(); 
 void mqtt_publish();
 void wifi_connect();
 void gsm_action();
 void gsm_parse(String);
 void alert();
 int read_serial(int, char*,int);
+void relay_turn_on();
+void relay_turn_off();
 
 /*==========================CURRENT READING VARIABLES=========================*/
 
@@ -177,7 +179,7 @@ void wifi_connect(){
 }
 
 void gsm_parse(String buff){
-  // Serial.println(buff);
+  Serial.println(buff);
 
   unsigned int index;
   unsigned int index_of_a;
@@ -211,8 +213,15 @@ void gsm_parse(String buff){
       index_of_a = msg.indexOf('a'); // last comma is where the string "amt" starts
       units = msg.substring(46, index_of_a);
 
-      index = buff.indexOf(0X22); // looking for position of the first double quotes
-      PHONE = buff.substring(index + 1, index + 14); // extract the phone number
+      // update units 
+      units = atoi(units.c_str());
+      received_units = atoi(units.c_str());
+      remaining_units = received_units;
+      // debug("Init Unts:"); debugln(received_units);
+
+
+      //index = buff.indexOf(0X22); // looking for position of the first double quotes
+      //PHONE = buff.substring(index + 1, index + 14); // extract the phone number
 
       // debug extracted variables
       // Serial.println(PHONE);
@@ -229,24 +238,21 @@ void gsm_parse(String buff){
  * 
  */
 void gsm_action(){
-  // if (msg == "led on")
-  // {
-  //   digitalWrite(LED_PIN, HIGH);
-  //   Reply("LED is ON");
-  // }
-  // else if (msg == "led off")
-  // {
-  //   digitalWrite(LED_PIN, LOW);
-  //   Reply("LED is OFF");
-  // }
+  
+  if (remaining_units <= 0) {
+    remaining_units = received_units;
 
-  // update units 
-  units = atoi(units.c_str());
-  received_units = atoi(units.c_str());
+    // turn off load
+    // relay_turn_off();
+  } else {
+    
+  }
+  
 
   PHONE = "";//Clears phone string
   msg = "";//Clears message string
   // units = ""; // clears the units string
+
 }
 
 /**
@@ -266,7 +272,6 @@ void gsm_reply(String text)
   delay(1000);
   Serial.println("SMS Sent Successfully.");
 }
-
 
 /**
  * calculate units
@@ -339,15 +344,37 @@ void oled_init(){
   display.begin();
 }
 
-void oled_show_message(String msg){
+void oled_show_message(String msg, int flag){ // flag shows what we are printing, can be current, power, raw msg etc...
   display.setFont(u8g2_font_10x20_mr);
-  
-  display.firstPage();
-  do {
-    display.setFont(u8g2_font_helvR14_tr);
-    display.drawStr(0,50, msg.c_str());
 
-  } while ( display.nextPage() );
+  if(flag == 0)  {
+    // raw message
+    display.firstPage();
+    do {
+      display.setFont(u8g2_font_helvR14_tr);
+      display.drawStr(0,50, msg.c_str());
+
+    } while ( display.nextPage() );
+  } else if(flag == 1) {
+    // current 
+    display.firstPage();
+    do {
+      display.setFont(u8g2_font_helvR14_tr);
+      display.drawStr(0,50, msg.c_str());
+      display.drawStr(40, 50, "Amperes"); // TODO: calculate x position 70 is hardcoded : 
+
+    } while ( display.nextPage() );
+  } else if (flag == 2){
+    // power
+    display.firstPage();
+    do {
+      display.setFont(u8g2_font_helvR14_tr);
+      display.drawStr(0,50, msg.c_str());
+      display.drawStr(70, 50, "KWh"); // TODO: calculate x position 70 is hardcoded : 
+
+    } while ( display.nextPage() );
+  }
+  
   
 }
 
@@ -356,7 +383,7 @@ void oled_show_message(String msg){
  * 
  */
 void oled_hello(){
-  oled_show_message("Booting...");
+  oled_show_message("Booting...", 0);
   delay(1000);
 }
 
@@ -385,15 +412,15 @@ void oled_default_screen(String msg){
  * 
  */
 void oled_message_received(){
-  oled_show_message("Message received...");
+  oled_show_message("Message received...", 0);
 
   delay(1000);
   
-  oled_show_message("Updating units...");
+  oled_show_message("Updating units...", 0);
 
   delay(1000);
 
-  oled_show_message("Units updated...");
+  oled_show_message("Units updated...", 0);
 
   delay(700);
 
@@ -403,24 +430,40 @@ void oled_message_received(){
 float calc_power_in_kwh(float current){
   // current received is in Amperes
   // calculate the power consumed in KW
-  power_kw = (RMS_VOLTAGE * current ) / 1000.0;
+  power_kw = (RMS_VOLTAGE * current ) / 1000.0; // TODO: change this conversion to consume units faster - for demo
 
   // get the time passed since the relay(load) was turned on
   current_time = millis();
   elapsed_time = current_time - load_turn_on_time;
 
   // convert the time to hours
-  elapsed_time_hrs = elapsed_time / (1000 * 60 * 60);
+  elapsed_time_hrs = (double) elapsed_time / (1000.0 * 60.0 * 60.0);
 
   // calculate the power in KWh
-  power_kwh = power_kw / elapsed_time_hrs;
-  consumed_units = power_kwh;
+  // power_kwh = power_kw / elapsed_time_hrs;
+  power_kwh = power_kw / 3600000.0; // arbitrary for testing 
+
+  // consumed_units = power_kwh; // TODO: here we assume 1kWh = 1 Unit 
+  consumed_units = power_kw; // TODO: for demo
+  debugln(consumed_units);
 
   // power_kwh represents the units 
   // calculate the remaining units
-  remaining_units = received_units - consumed_units;
+  remaining_units = remaining_units - consumed_units;
+  // debugln(received_units);
+  // debug("RemU:");
+  // debugln(remaining_units);
 
-  return power_kwh;
+  // debug("ElpsdTm:"); debugln(elapsed_time_hrs);
+  // debug("KWH:"); debugln(power_kwh);
+
+  oled_show_message((String)remaining_units + "     Units", 0); // show remaining units on screen 
+  delay(1000);
+
+  // Serial.print("Units:"); Serial.println(remaining_units);Serial.print("\t");
+  // Serial.print(elapsed_time);
+
+  return power_kwh; // TODO: not necessary
 
 }
 
@@ -431,7 +474,7 @@ float calc_power_in_kwh(float current){
 void mqtt_publish(float current){
 
   // create MQTT message
-  snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f", Amps_TRMS, power_kwh); // todo: check for correct length
+  snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, relay_on_off_flag); // TODO: check for correct length
 
   if(client.publish(topic, mqtt_msg)){
     debugln("[+]Data published");
@@ -454,10 +497,14 @@ void setup() {
   // init mqtt
   initialize_mqtt();
 
+  // turn on load - load is Normally ON
+  relay_turn_on();
+
   // pinmodes
-  // pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
   pinMode(ALERT_LED, OUTPUT);
   pinMode(CURRENT_SENSOR_PIN, INPUT);
+  pinMode(RELAY, OUTPUT);
 
   // int oled
   oled_init();
@@ -477,16 +524,36 @@ void setup() {
   Serial.println("[+]Initializing GSM module...");
 
   Serial2.print("AT+CMGF=1\r"); //SMS text mode
+
+  // set up the GSM to send SMS to ESP32, not the notification only
+  Serial2.print("AT+CNMI=2,2,0,0,0\r");
   delay(1000);
 
 }
 
 void loop() {
 
+  while (Serial2.available()){
+    gsm_parse(Serial2.readString());//Calls the parseData function to parse SMS
+
+    // update screen
+    oled_message_received();
+
+    // alert
+    alert();
+
+  }
+
+  //gsm_action(); // Does necessary action according to SMS message
+
+  while (Serial.available()){
+    Serial2.println(Serial.readString());
+  }
+
+  //--------------------measure current------------------------------
   RunningStatistics inputStats;                 // create statistics   to look at the raw test signal
   inputStats.setWindowSecs( windowLength );     //Set   the window length
     
-
   ACS_Value = analogRead(CURRENT_SENSOR_PIN);   // read the analog in value:
   inputStats.input(ACS_Value);  // log to Stats   function
       
@@ -495,85 +562,74 @@ void loop() {
     
     Amps_TRMS = intercept + slope * inputStats.sigma();
 
-    Serial.print( "Amps: " ); 
-    Serial.print( Amps_TRMS );
-    Serial.println();
-
-    // update reading on screen
-    oled_show_message((String) Amps_TRMS);
-    
-    // --------------------TRANSMIT TO MQTT------------------
-    if(!client.connected()){
-      debugln("[-]Client not connected...");
-      unsigned long now = millis();
-
-      if(now - last_reconnect_attempt > MQTT_RETRY_TIME){
-        last_reconnect_attempt = now;
-
-        if(mqtt_reconnect()){
-          debugln("[+]Reconnected...");
-          last_reconnect_attempt = 0;
-        }
-    }
-    } else {
-      client.loop();
-      unsigned long current_millis = millis();
-
-      if(current_millis - previous_millis >= SENSOR_POLL_TIME){
-        previous_millis = current_millis;
-
-        //mqtt_publish();
-
-        //----------------publish to mqtt
-        // create MQTT message
-        snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f", Amps_TRMS, power_kwh); // todo: check for correct length
-
-        if(client.publish(topic, mqtt_msg)){
-          debugln("[+]Data published");
-        } else {
-          debugln("[-]Failed to publish");
-        }
-
-      }
-
-    }
-
-    //-------------------------------------------------------
-
   }
 
-  while (Serial2.available())
-  {
-    gsm_parse(Serial2.readString());//Calls the parseData function to parse SMS
+  // update reading on screen
+  oled_show_message((String) Amps_TRMS, 1);
+  delay(1000);
 
-    // TODO:update screen
-
-    // TODO:alert
-  }
-
-  gsm_action();//Does necessary action according to SMS message
-
-  while (Serial.available())
-  {
-    Serial2.println(Serial.readString());
-  }
-
-  // perform units(tokens) conversion
-  debugln(received_units);
+  //-------------------------calc power in kwh-----------------------------
+  calc_power_in_kwh(Amps_TRMS);
+  //-----------------------------------------
 
   // find out whether the remaining units have gone below the threshold
   if(remaining_units <= UNIT_THRESHOLD){
-    // TODO: ALERT 
+    // ALERT 
     alert();
-    oled_show_message("Low on units. Please recharge.");
+    oled_show_message("Low on units", 0);
     delay(1000);
 
     // TODO: SEND SMS TO NOTIFY 
 
-    // TODO: CUTOFF LOAD - consider cutting off load after units are all depleted
+  }
+
+  // turn off load if units are depleted
+  if(remaining_units <= 0){
     relay_turn_off();
+  } else {
+    relay_turn_on();
+  }
+  
+  // --------------------TRANSMIT TO MQTT------------------
+  if(!client.connected()){
+    debugln("[-]Client not connected...");
+    unsigned long now = millis();
+
+    if(now - last_reconnect_attempt > MQTT_RETRY_TIME){
+      last_reconnect_attempt = now;
+
+      if(mqtt_reconnect()){
+        debugln("[+]Reconnected...");
+        last_reconnect_attempt = 0;
+      }
+  }
+  } else {
+    client.loop();
+    unsigned long current_millis = millis();
+
+    if(current_millis - previous_millis >= SENSOR_POLL_TIME){
+      previous_millis = current_millis;
+
+      //mqtt_publish();
+
+      //----------------publish to mqtt------------------------------
+      // create MQTT message
+      debug("p:"); debug(power_kw); debug("remun: "); debug(remaining_units); debug("ld_stat:"); debug(relay_on_off_flag);
+      snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f", Amps_TRMS, power_kw, remaining_units); // todo: check for correct length
+
+      if(client.publish(topic, mqtt_msg)){
+        // debugln("[+]Data published");
+      } else {
+        debugln("[-]Failed to publish");
+      }
+
+    }
 
   }
+
+    //-------------------------------------------------------
+
+  
 }
 //-------------------------END OF VOID LOOP--------------------------------
 
