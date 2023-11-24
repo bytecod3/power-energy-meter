@@ -11,6 +11,7 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
         <script src="https://use.fontawesome.com/fd981f6249.js"></script>
 
+        
         <!-- Styles -->
         @vite('resources/css/app.css')
     </head>
@@ -22,6 +23,16 @@
         </div>
 
         <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
+        <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+        <script>
+            // Globally initializes an mqtt variable
+            console.log(mqtt)
+        </script>
+                
+        <script src="{{ URL::asset('scripts/main.js') }}" type="text/javascript"></script>
+        {{-- JS MQTT Client --}}
+        
     </body>
 
 </html>

@@ -26,34 +26,34 @@ class UnitController extends Controller
         
     }
 
-    public function connect_to_broker(){
-        $connection_settings = (new ConnectionSettings)
-        ->setUsername($this->username)
-        ->setPassword($this->password)
-        ->setKeepAliveInterval(60)
-        ->setLastWillTopic('emqx/last-will')
-        ->setLastWillMessage('client disconnect')
-        ->setLastWillQualityOfService(1);
+    // public function connect_to_broker(){
+    //     $connection_settings = (new ConnectionSettings)
+    //     ->setUsername($this->username)
+    //     ->setPassword($this->password)
+    //     ->setKeepAliveInterval(60)
+    //     ->setLastWillTopic('emqx/last-will')
+    //     ->setLastWillMessage('client disconnect')
+    //     ->setLastWillQualityOfService(1);
 
-        $mqtt = new MqttClient($this->server, $this->port, $this->client_id, $this->mqtt_version);
+    //     $mqtt = new MqttClient($this->server, $this->port, $this->client_id, $this->mqtt_version);
 
-        $mqtt->connect($connection_settings, $this->clean_session);
-        printf('client connected \n');
+    //     $mqtt->connect($connection_settings, $this->clean_session);
+    //     printf('client connected \n');
 
-        // subscribe to the given topic
-        $mqtt->subscribe('power/meter', function ($topic, $message){
-            // save the data received into the database ad update the UI
+    //     // subscribe to the given topic
+    //     $mqtt->subscribe('power/meter', function ($topic, $message){
+    //         // save the data received into the database ad update the UI
             
-            printf('Received message on topic [%s]: %s\n', $topic, $message);
-        }, 0);
+    //         printf('Received message on topic [%s]: %s\n', $topic, $message);
+    //     }, 0);
     
 
-    }
+    // }
 
     public function show(Request $request){
 
         // subscribe to mqtt topic
-        $this->connect_to_broker();
+        // $this->connect_to_broker();z
 
 
         return view('units.show')->with([
