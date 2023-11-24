@@ -8,6 +8,7 @@
 /*=================CURRENT SENSOR VARIABLES===============================*/
 const int average_value = 500; // take avg of 500 samples
 float power_watt = 0;
+float cumulative_power_kwh = 0;
 float v_rms = 230.0; // default RMS voltage 
 
 /*===================MQTT VARIABLES========================================*/
@@ -26,8 +27,8 @@ PubSubClient client(esp_client);
 
 /*==========================wifi credentials========================*/
 #define WIFI_RETRY_TIME 50
-const char* ssid = "Gakibia-Unit3";
-const char* password = "password";
+const char* ssid = "Boen";
+const char* password = "12345678";
 
 /*======================TIMING VARIABLES==================================*/
 unsigned long ACS_current_sample_time = 0, ACS_previous_sample_time = 0;
@@ -433,11 +434,11 @@ float calc_power_in_kwh(float current){
   power_kw = (RMS_VOLTAGE * current ) / 1000.0; // TODO: change this conversion to consume units faster - for demo
 
   // get the time passed since the relay(load) was turned on
-  current_time = millis();
-  elapsed_time = current_time - load_turn_on_time;
+  // current_time = millis();
+  // elapsed_time = current_time - load_turn_on_time;
 
   // convert the time to hours
-  elapsed_time_hrs = (double) elapsed_time / (1000.0 * 60.0 * 60.0);
+  // elapsed_time_hrs = (double) elapsed_time / (1000.0 * 60.0 * 60.0);
 
   // calculate the power in KWh
   // power_kwh = power_kw / elapsed_time_hrs;
@@ -460,6 +461,9 @@ float calc_power_in_kwh(float current){
   oled_show_message((String)remaining_units + "     Units", 0); // show remaining units on screen 
   delay(1000);
 
+  // calculated power connsumption
+  cumulative_power_kwh += power_kwh;
+
   // Serial.print("Units:"); Serial.println(remaining_units);Serial.print("\t");
   // Serial.print(elapsed_time);
 
@@ -474,7 +478,7 @@ float calc_power_in_kwh(float current){
 void mqtt_publish(float current){
 
   // create MQTT message
-  snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, relay_on_off_flag); // TODO: check for correct length
+  snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
 
   if(client.publish(topic, mqtt_msg)){
     debugln("[+]Data published");
