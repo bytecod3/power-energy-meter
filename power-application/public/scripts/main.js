@@ -103,7 +103,9 @@ client.on('message', (topic, message, packet) => {
     units_div.innerText = data[2];
 
     // show the units remaining
+    console.log("Cumulative power")
+    console.log(data[4])
     let cumulative_power = document.getElementById("cumulative_power");
-    units_div.innerText = data[4];
+    cumulative_power.innerText = data[4];
 
 })
