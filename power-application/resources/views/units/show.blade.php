@@ -62,6 +62,19 @@
                         </div>
         
                     </div>
+
+                    {{-- cumulative power --}}
+                    <div class="text-white flex flex-col border border-gray-300 p-4 bg-blue-900 rounded-md">
+                        <div class="font-bold  border-b border-gray-300">
+                            Cumulative power
+                        </div>
+        
+                        <div class="font-extrabold">
+                            <span id="cumulative_power" class="text-5xl "></span>
+                            <span>kWh</span>
+                        </div>
+        
+                    </div>
         
                     {{-- Units --}}
                     <div class="flex flex-col border bg-green-400  p-4 rounded-md text-white">
@@ -83,7 +96,6 @@
             
         </div>
 
-       
         <div class="flex flex-col">
             <div id="test" class=" w-full text-white font-bold p-2 bg-gradient-to-b from-gray-200 via-gray-400 to-gray-600">Log info</div>
 
