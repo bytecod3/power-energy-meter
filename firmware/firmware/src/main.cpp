@@ -8,7 +8,6 @@
 /*=================CURRENT SENSOR VARIABLES===============================*/
 const int average_value = 500; // take avg of 500 samples
 float power_watt = 0;
-float cumulative_power_kwh;
 float v_rms = 230.0; // default RMS voltage 
 
 /*===================MQTT VARIABLES========================================*/
@@ -429,6 +428,13 @@ void oled_message_received(){
 
 }
 
+float cumulative_pow = 0;
+float calc_cumulative_power(float power_kwh){
+  cumulative_pow += power_kwh;
+
+  return cumulative_pow;
+}
+
   
 float calc_power_in_kwh(float current){
   // current received is in Amperes
@@ -472,19 +478,19 @@ float calc_power_in_kwh(float current){
  * This function is not used
  * 
  */
-void mqtt_publish(float current){
+// void mqtt_publish(float current){
 
-  // create MQTT message
-  Serial.println(cumulative_power_kwh);
-  snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
+//   // create MQTT message
+//   Serial.println(cumulative_power_kwh);
+//   snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
 
-  if(client.publish(topic, mqtt_msg)){
-    debugln("[+]Data published");
-  } else {
-    debugln("[-]Failed to publish");
-  }
+//   if(client.publish(topic, mqtt_msg)){
+//     debugln("[+]Data published");
+//   } else {
+//     debugln("[-]Failed to publish");
+//   }
 
-}
+// }
 
 /**
  * Setup
@@ -492,6 +498,9 @@ void mqtt_publish(float current){
  */
 void setup() {
   Serial.begin(115200);
+  delay(1000);
+  Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
+  delay(1000);
 
   // connect to wifi
   wifi_connect();
@@ -603,11 +612,11 @@ void loop() {
         debugln("[+]Reconnected...");
         last_reconnect_attempt = 0;
       }
-  }
+    }
   } else {
     client.loop();
     unsigned long current_millis = millis();
-
+             
     if(current_millis - previous_millis >= SENSOR_POLL_TIME){
       previous_millis = current_millis;
 
@@ -619,9 +628,15 @@ void loop() {
       //snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f", Amps_TRMS, power_kw, remaining_units); // todo: check for correct length
       
       // calculated power connsumption
-      cumulative_power_kwh += power_kwh;
+      float cumulative_power_kwh = calc_cumulative_power(power_kwh);
+      // float cumulative_power_kwh = calc_cumulative_power(power_kwh);
+      // debug("PowerKWh: "); debugln(power_kwh);
+
       debug("total power: ");
-      debugln(cumulative_power_kwh);
+      debugln(power_kwh);
+
+      // debug("current: ");
+      // debugln(Amps_TRMS);
 
       snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
 
