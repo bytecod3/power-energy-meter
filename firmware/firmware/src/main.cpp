@@ -8,7 +8,7 @@
 /*=================CURRENT SENSOR VARIABLES===============================*/
 const int average_value = 500; // take avg of 500 samples
 float power_watt = 0;
-float cumulative_power_kwh = 0;
+float cumulative_power_kwh;
 float v_rms = 230.0; // default RMS voltage 
 
 /*===================MQTT VARIABLES========================================*/
@@ -27,8 +27,8 @@ PubSubClient client(esp_client);
 
 /*==========================wifi credentials========================*/
 #define WIFI_RETRY_TIME 50
-const char* ssid = "Boen";
-const char* password = "12345678";
+const char* ssid = "Gakibia-Unit3";
+const char* password = "password";
 
 /*======================TIMING VARIABLES==================================*/
 unsigned long ACS_current_sample_time = 0, ACS_previous_sample_time = 0;
@@ -41,7 +41,7 @@ unsigned long ACS_sample_interval;
 
 /*===========================TOKEN CONVERSION VARIABLES===================*/
 String msg;
-String PHONE = "";
+String PHONE = "+254700750148"; // TODO: change to real number
 int unit_value = 1000; // 1 token is 1 kWh
 String meter_id = "";
 String token;
@@ -221,11 +221,11 @@ void gsm_parse(String buff){
       // debug("Init Unts:"); debugln(received_units);
 
 
-      //index = buff.indexOf(0X22); // looking for position of the first double quotes
-      //PHONE = buff.substring(index + 1, index + 14); // extract the phone number
+      index = buff.indexOf(0X22); // looking for position of the first double quotes
+      PHONE = buff.substring(index + 1, index + 14); // extract the phone number
 
       // debug extracted variables
-      // Serial.println(PHONE);
+      Serial.println(PHONE);
       // Serial.println(units);
 
     }
@@ -329,8 +329,10 @@ void relay_turn_on(){
   digitalWrite(RELAY, HIGH);
 
   // set the load on flag to 1
-  relay_on_off_flag = 1;
-
+  if(!relay_on_off_flag){
+    relay_on_off_flag = 1;
+  }
+  
   // log the exact time that this device has been turned on
   load_turn_on_time = millis(); 
 
@@ -446,38 +448,34 @@ float calc_power_in_kwh(float current){
 
   // consumed_units = power_kwh; // TODO: here we assume 1kWh = 1 Unit 
   consumed_units = power_kw; // TODO: for demo
-  debugln(consumed_units);
 
   // power_kwh represents the units 
   // calculate the remaining units
   remaining_units = remaining_units - consumed_units;
-  // debugln(received_units);
-  // debug("RemU:");
-  // debugln(remaining_units);
 
   // debug("ElpsdTm:"); debugln(elapsed_time_hrs);
   // debug("KWH:"); debugln(power_kwh);
-
-  oled_show_message((String)remaining_units + "     Units", 0); // show remaining units on screen 
-  delay(1000);
-
-  // calculated power connsumption
-  cumulative_power_kwh += power_kwh;
-
+  
+  if(remaining_units > 0){
+    oled_show_message((String)remaining_units + "     Units", 0); // show remaining units on screen 
+    delay(1000);
+  }
   // Serial.print("Units:"); Serial.println(remaining_units);Serial.print("\t");
   // Serial.print(elapsed_time);
 
-  return power_kwh; // TODO: not necessary
+  return power_kwh;
 
 }
 
 /**
  * Publish data to broker
+ * This function is not used
  * 
  */
 void mqtt_publish(float current){
 
   // create MQTT message
+  Serial.println(cumulative_power_kwh);
   snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
 
   if(client.publish(topic, mqtt_msg)){
@@ -488,12 +486,12 @@ void mqtt_publish(float current){
 
 }
 
-
 /**
  * Setup
  * 
  */
 void setup() {
+  Serial.begin(115200);
 
   // connect to wifi
   wifi_connect();
@@ -509,6 +507,7 @@ void setup() {
   pinMode(ALERT_LED, OUTPUT);
   pinMode(CURRENT_SENSOR_PIN, INPUT);
   pinMode(RELAY, OUTPUT);
+  Serial.println("Hello!!");
 
   // int oled
   oled_init();
@@ -521,17 +520,16 @@ void setup() {
   
   // init serial 
   debugln("[+]Initializing hardware serial 1");
-  Serial.begin(115200);
   delay(1000);
 
-  Serial2.begin(115200);
+  // Serial2.begin(115200);
   Serial.println("[+]Initializing GSM module...");
 
   Serial2.print("AT+CMGF=1\r"); //SMS text mode
 
   // set up the GSM to send SMS to ESP32, not the notification only
   Serial2.print("AT+CNMI=2,2,0,0,0\r");
-  delay(1000);
+  delay(2000);
 
 }
 
@@ -582,8 +580,7 @@ void loop() {
     alert();
     oled_show_message("Low on units", 0);
     delay(1000);
-
-    // TODO: SEND SMS TO NOTIFY 
+    // gsm_reply("Low units. Recharge");
 
   }
 
@@ -618,8 +615,15 @@ void loop() {
 
       //----------------publish to mqtt------------------------------
       // create MQTT message
-      debug("p:"); debug(power_kw); debug("remun: "); debug(remaining_units); debug("ld_stat:"); debug(relay_on_off_flag);
-      snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f", Amps_TRMS, power_kw, remaining_units); // todo: check for correct length
+      // debug("p:"); debug(power_kw); debug("remun: "); debug(remaining_units); debug("ld_stat:"); debug(relay_on_off_flag);
+      //snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f", Amps_TRMS, power_kw, remaining_units); // todo: check for correct length
+      
+      // calculated power connsumption
+      cumulative_power_kwh += power_kwh;
+      debug("total power: ");
+      debugln(cumulative_power_kwh);
+
+      snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
 
       if(client.publish(topic, mqtt_msg)){
         // debugln("[+]Data published");

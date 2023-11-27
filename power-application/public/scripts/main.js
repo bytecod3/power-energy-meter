@@ -79,7 +79,7 @@ client.on('message', (topic, message, packet) => {
     // console.log('Received Message: ' + message.toString() + '\nOn topic: ' + topic)
     // console.log(message.toString());
 
-    // split the string 
+    // split the string
     let message_string = message.toString();
     let data = message_string.split(",");
     if (data[2] < 0) {
@@ -89,7 +89,7 @@ client.on('message', (topic, message, packet) => {
     // data[1] -> power in kwh
     // data[2] -> remaining units
 
-    // update the screen 
+    // update the screen
     // show the current
     let current_div = document.getElementById("current_div");
     current_div.innerText = data[0];
@@ -107,5 +107,13 @@ client.on('message', (topic, message, packet) => {
     console.log(data[4])
     let cumulative_power = document.getElementById("cumulative_power");
     cumulative_power.innerText = data[4];
+
+    // calculate the total amount consumed
+    // unit price = 26 KES per kWh
+    let amount_spent_div = document.getElementById("amount_div");
+    let unit_price = 26.5;
+    let amount_spent = data[1] * unit_price;
+    amount_spent_div.innerText = amount_spent;
+
 
 })

@@ -1,11 +1,12 @@
 {
-	"folders": [
+    "folders": [
 		{
-			"path": "../../../power-application"
+			"name": "firmware",
+			"path": ".."
 		},
 		{
-			"path": "../.."
+			"path": "../../../power-application"
 		}
 	],
-	"settings": {}
+    "settings": {}
 }

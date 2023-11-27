@@ -1,0 +1,31 @@
+<mxfile host="Electron" modified="2023-11-27T06:34:24.690Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.5.1 Chrome/112.0.5615.204 Electron/24.6.0 Safari/537.36" etag="cM1ZCgLGMASdHSDcvnpt" version="21.5.1" type="device">
+  <diagram name="Page-1" id="pgF786cqAsamjEXh2f5H">
+    <mxGraphModel dx="903" dy="1075" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="xMUf5a9D-Asquq3satuR-1" value="Start" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="83" y="-84" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="xMUf5a9D-Asquq3satuR-2" value="Connect to Wifi" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="72" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xMUf5a9D-Asquq3satuR-4" value="Initialize peripherals - OLED, GSM, BUZZER, ACS712" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="70" y="153" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="xMUf5a9D-Asquq3satuR-5" value="Start reading current in the loop" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="70" y="454" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xMUf5a9D-Asquq3satuR-6" value="Publish data to MQTT" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="324" y="412" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xMUf5a9D-Asquq3satuR-7" value="Calculate consumed power" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="70" y="568" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xMUf5a9D-Asquq3satuR-9" value="Device ON?" style="rhombus;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="88" y="311" width="80" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
