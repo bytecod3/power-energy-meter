@@ -15,17 +15,24 @@ void setup()
 
   Serial2.println("AT"); //Once the handshake test is successful, it will back to OK
   updateSerial();
-  Serial2.println("AT+CSQ"); //Signal quality test, value range is 0-31 , 31 is the best
+//  Serial2.println("AT+CSQ"); //Signal quality test, value range is 0-31 , 31 is the best
+//  updateSerial();
+//  Serial2.println("AT+CCID"); //Read SIM information to confirm whether the SIM is plugged
+//  updateSerial();
+//  Serial2.println("AT+CREG?"); //Check whether it has registered in the network
   updateSerial();
-  Serial2.println("AT+CCID"); //Read SIM information to confirm whether the SIM is plugged
+
+  Serial2.println("AT+CMGF=1"); // Configuring TEXT mode
   updateSerial();
-  Serial2.println("AT+CREG?"); //Check whether it has registered in the network
+  Serial2.println("AT+CMGS=\"+254700750148\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
   updateSerial();
+  Serial2.print("Last Minute Engineers | lastminuteengineers.com"); //text content
+  updateSerial();
+  Serial2.write(26);
 }
 
 void loop() {
   updateSerial(); // todo: change this method
-
 
 }
 

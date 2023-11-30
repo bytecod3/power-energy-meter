@@ -15,11 +15,11 @@
                     {{-- Activity --}}
                     <div class="flex flex-col border bg-green-400  p-4 rounded-md text-white">
                         <div class="font-bold text-white border-b border-gray-300">
-                            Status
+                            Load Status
                         </div>
 
                         <div class="text-white shadow-sm font-extrabold">
-                            <span class="text-5xl ">ON</span>
+                            <span id="relay_status_div" class="text-5xl "></span>
                         </div>
 
                     </div>

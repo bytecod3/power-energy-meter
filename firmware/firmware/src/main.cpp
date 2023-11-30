@@ -26,8 +26,8 @@ PubSubClient client(esp_client);
 
 /*==========================wifi credentials========================*/
 #define WIFI_RETRY_TIME 50
-const char* ssid = "Gakibia-Unit3";
-const char* password = "password";
+const char* ssid = "Eduh";
+const char* password = "password2";
 
 /*======================TIMING VARIABLES==================================*/
 unsigned long ACS_current_sample_time = 0, ACS_previous_sample_time = 0;
@@ -40,7 +40,8 @@ unsigned long ACS_sample_interval;
 
 /*===========================TOKEN CONVERSION VARIABLES===================*/
 String msg;
-String PHONE = "+254700750148"; // TODO: change to real number
+String PHONE = "+254700750148"; 
+int sms_reply_flag = 0;
 int unit_value = 1000; // 1 token is 1 kWh
 String meter_id = "";
 String token;
@@ -260,17 +261,43 @@ void gsm_action(){
  * 
  * @param text 
  */
-void gsm_reply(String text)
-{
+void gsm_reply(String text){
+  Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
   Serial2.print("AT+CMGF=1\r");
   delay(1000);
-  Serial2.print("AT+CMGS=\"" + PHONE + "\"\r");
+  // updateSerial();
+  Serial2.print("AT+CMGS=\"+254700750148\"\r");
   delay(1000);
-  Serial2.print(text);
+  Serial2.print(text); // send SMS
   delay(100);
   Serial2.write(0x1A); //ascii code for ctrl+z, DEC->26, HEX->0x1A
   delay(1000);
-  Serial.println("SMS Sent Successfully.");
+  debugln("SMS Sent Successfully.");
+}
+
+void set_gsm_to_receive(){
+  // Serial2.begin(115200);
+  Serial.println("[+]Initializing GSM module...");
+  Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
+
+  Serial2.print("AT+CMGF=1\r"); //SMS text mode
+
+  // set up the GSM to send SMS to ESP32, not the notification only
+  Serial2.print("AT+CNMI=2,2,0,0,0\r");
+  delay(2000);
+}
+
+void updateSerial()
+{
+  delay(500);
+  while (Serial.available()) 
+  {
+    Serial2.write(Serial.read());//Forward what Serial received to Software Serial Port
+  }
+  while(Serial2.available()) 
+  {
+    Serial.write(Serial2.read());//Forward what Software Serial received to Serial Port
+  }
 }
 
 /**
@@ -280,14 +307,6 @@ void gsm_reply(String text)
 float calculate_units(){
   float units = 0; // received units from SERVER
   return units;
-}
-
-/**
- * @brief 
- * 
- */
-void receive_from_http(){
-
 }
 
 
@@ -450,7 +469,7 @@ float calc_power_in_kwh(float current){
 
   // calculate the power in KWh
   // power_kwh = power_kw / elapsed_time_hrs;
-  power_kwh = power_kw / 3600000.0; // arbitrary for testing 
+  power_kwh = power_kw / 36000.0; // arbitrary for testing 
 
   // consumed_units = power_kwh; // TODO: here we assume 1kWh = 1 Unit 
   consumed_units = power_kw; // TODO: for demo
@@ -470,6 +489,7 @@ float calc_power_in_kwh(float current){
   // Serial.print(elapsed_time);
 
   return power_kwh;
+  // return power_kw;
 
 }
 
@@ -581,6 +601,8 @@ void loop() {
 
   //-------------------------calc power in kwh-----------------------------
   calc_power_in_kwh(Amps_TRMS);
+  float pwr = calc_power_in_kwh(Amps_TRMS);
+  debug("Pwer: "); debugln(pwr);
   //-----------------------------------------
 
   // find out whether the remaining units have gone below the threshold
@@ -589,13 +611,34 @@ void loop() {
     alert();
     oled_show_message("Low on units", 0);
     delay(1000);
-    // gsm_reply("Low units. Recharge");
 
   }
 
   // turn off load if units are depleted
   if(remaining_units <= 0){
     relay_turn_off();
+    
+    // sms_reply_flag = 1;
+
+    // if(sms_reply_flag == 1){
+    //   Serial2.print("AT+CMGF=1\r");
+    //   updateSerial();
+    //   delay(1000);
+    //   Serial2.print("AT+CMGS=\"" + PHONE + "\"\r");
+    //   delay(1000);
+    //   Serial2.print("Low units\r");
+    //   updateSerial();
+    //   delay(100);
+    //   Serial2.write(0x1A); //ascii code for ctrl+z, DEC->26, HEX->0x1A
+    //   updateSerial();
+    //   delay(1000);
+    //   Serial.println("SMS Sent Successfully.");
+    //   sms_reply_flag = 0; 
+    // } else {
+    //   Serial2.print("AT+CNMI=2,2,0,0,0\r");
+    //   delay(1000);
+    // }
+
   } else {
     relay_turn_on();
   }
@@ -608,12 +651,12 @@ void loop() {
     if(now - last_reconnect_attempt > MQTT_RETRY_TIME){
       last_reconnect_attempt = now;
 
-      if(mqtt_reconnect()){
+      if(mqtt_reconnect()){ // mqtt is connected at this point
         debugln("[+]Reconnected...");
         last_reconnect_attempt = 0;
       }
     }
-  } else {
+  } else { // if mqtt is connected
     client.loop();
     unsigned long current_millis = millis();
              
@@ -632,13 +675,15 @@ void loop() {
       // float cumulative_power_kwh = calc_cumulative_power(power_kwh);
       // debug("PowerKWh: "); debugln(power_kwh);
 
-      debug("total power: ");
-      debugln(power_kwh);
+      debug("power: ");
+      float p = calc_power_in_kwh(Amps_TRMS);
+      debugln(p);
 
-      // debug("current: ");
-      // debugln(Amps_TRMS);
+      // debug("total power: ");
+      // debugln(cumulative_power_kwh);
+      debug("REL_STAT:"); debugln(relay_on_off_flag);
 
-      snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.2f, %.2f, %.2f, %d", Amps_TRMS, power_kwh, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
+      snprintf(mqtt_msg, sizeof(mqtt_msg), "%.2f, %.6f, %.2f, %.2f, %d", Amps_TRMS, p, remaining_units, cumulative_power_kwh, relay_on_off_flag); // TODO: check for correct length
 
       if(client.publish(topic, mqtt_msg)){
         // debugln("[+]Data published");

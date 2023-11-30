@@ -67,12 +67,22 @@ client.on('reconnect', () => {
 
 })
 
+// on connection
 client.on('connect', () => {
     console.log('Client connected:' + clientId);
     document.getElementById("submsg").innerHTML = "<span class='text-green-600 font-bold'>MQTT connected. Receiving data</span>";
     // Subscribe
     client.subscribe('power/meter', { qos: 0 });
 })
+
+let total_p_kwh = 0.0;
+
+function calc_cumulative_power(x){
+    let y = parseFloat(x);
+    total_p_kwh += y;
+
+    return total_p_kwh;
+}
 
 // Received
 client.on('message', (topic, message, packet) => {
@@ -82,12 +92,24 @@ client.on('message', (topic, message, packet) => {
     // split the string
     let message_string = message.toString();
     let data = message_string.split(",");
+
     if (data[2] < 0) {
         data[2] = 0.0;
     }
+
     // data[0] -> current
     // data[1] -> power in kwh
     // data[2] -> remaining units
+
+    let relay_status_div = document.getElementById("relay_status_div");
+    let relay_status = parseInt(data[4]);
+    console.log(relay_status);
+
+    if(relay_status == 1){
+        relay_status_div.innerText = "LOAD ON";
+    } else if(relay_status == 0){
+        relay_status_div.innerText = "LOAD OFF";
+    }
 
     // update the screen
     // show the current
@@ -96,24 +118,30 @@ client.on('message', (topic, message, packet) => {
 
     // show power in kwh
     let power_div = document.getElementById("power_div");
-    power_div.innerText = data[1];
+    let p = data[1];
+//     console.log(p);
+    //power_div.innerText = data[1];
+    power_div.innerText = p;
 
     // show the units remaining
     let units_div = document.getElementById("units_div");
     units_div.innerText = data[2];
 
     // show the units remaining
-    console.log("Cumulative power")
-    console.log(data[4])
+    //console.log("Cumulative power")
+    //console.log(data[4])
     let cumulative_power = document.getElementById("cumulative_power");
-    cumulative_power.innerText = data[4];
+    let total_p = calc_cumulative_power(p);
+    // cumulative_power.innerText = data[4];
+    //cumulative_power.innerText = total_p_kwh;
+    cumulative_power.innerText = total_p.toPrecision(5);
+
 
     // calculate the total amount consumed
     // unit price = 26 KES per kWh
     let amount_spent_div = document.getElementById("amount_div");
     let unit_price = 26.5;
-    let amount_spent = data[1] * unit_price;
-    amount_spent_div.innerText = amount_spent;
-
+    let amount_spent = total_p_kwh * unit_price;
+    amount_spent_div.innerText = amount_spent.toPrecision(5);
 
 })
