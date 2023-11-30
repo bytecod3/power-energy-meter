@@ -26,8 +26,8 @@ PubSubClient client(esp_client);
 
 /*==========================wifi credentials========================*/
 #define WIFI_RETRY_TIME 50
-const char* ssid = "Eduh";
-const char* password = "password2";
+const char* ssid = "Boen";
+const char* password = "12345678";
 
 /*======================TIMING VARIABLES==================================*/
 unsigned long ACS_current_sample_time = 0, ACS_previous_sample_time = 0;
@@ -40,7 +40,7 @@ unsigned long ACS_sample_interval;
 
 /*===========================TOKEN CONVERSION VARIABLES===================*/
 String msg;
-String PHONE = "+254700750148"; 
+String PHONE = "+254700750148"; // TODO: change to owner's number 
 int sms_reply_flag = 0;
 int unit_value = 1000; // 1 token is 1 kWh
 String meter_id = "";
